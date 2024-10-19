@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket io</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #block {
+            position: relative;
+            height: 500px;
+            width: 500px;
+            border: 1px solid grey;
+        }
+        #messages {
+            list-style-type: none;
+            margin:0;
+            padding: 0;
+            color: black;
+            height: 400px; 
+            overflow-y: scroll; 
+        }
+        li{
+            margin:5px;
+            font-family:Helvetica, sans-serif;
+            color:grey;
+        }
+        .zone_saisie {
+            position: absolute;
+            top: 90%;
+            width: 100%;
+            height:50px;
+            padding:10px;
+            background:lightgray;
+        }
+        #m {
+            position:relative;
+            width: 85%;
+        }
+    </style>
+</head>
+<body>
+    <div id="block">
+        <ul id="messages"></ul>
+        <div class="zone_saisie">
+            <input id="m"/>
+            <button onclick="send()">Envoyer</button>
+        </div>
+    </div>
+
+    <!-- Charger le script Socket.io depuis le CDN -->
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        let socket = io();
+
+        socket.on('connect', function() {
+            console.log('Connecté à Socket.io');
+        });
+
+        function send() {
+            let text = document.getElementById('m').value;
+            if (text.trim() !== '') {
+                console.log('Message à envoyer : ' + text); // Log pour vérifier le texte à envoyer
+                socket.emit('chat message', text);
+                document.getElementById('m').value = ''; // Vide le champ de saisie après envoi
+            }
+        }
+
+        socket.on('chat message', function(msg) {
+            console.log('Message reçu côté client : ' + msg); // Log pour confirmer la réception du message
+            let ul = document.getElementById('messages');
+            if (ul) {
+                console.log('Liste des messages trouvée'); // Log si la liste est trouvée
+               let li = document.createElement('li');
+                li.innerText = msg;
+                ul.appendChild(li);
+                console.log('Message ajouté à la liste');
+            } else {
+                console.log('Erreur : élément <ul> non trouvé');
+            }
+        });
+    </script>
+</body>
+</html>
