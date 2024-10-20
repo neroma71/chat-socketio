@@ -1,0 +1,54 @@
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    padding: 0;
+}
+#block {
+    position: relative;
+    height: 500px;
+    width: 500px;
+    top:50px;
+    left:calc(50% - 250px);
+    border: 1px solid grey;
+}
+#messages {
+    list-style-type: none;
+    margin:0;
+    padding: 0;
+    color: black;
+    height:400px; 
+    overflow-y: scroll; 
+}
+li{
+    margin:0;
+    padding:5px;
+    font-family:Helvetica, sans-serif;
+    color:grey;
+}
+#messages :nth-child(odd){
+    background-color:rgb(202, 138, 184);
+    color:white;
+}
+.zone_saisie {
+    position: absolute;
+    top:calc(100% - 100px);
+    width: 100%;
+    height:100px;
+    padding:10px;
+    background:rgb(202, 138, 184);
+}
+#m {
+    position:relative;
+    width: 85%;
+}
+button{
+    background:rgb(74, 73, 73);
+    cursor:pointer;
+    border:none;
+    height:30px;
+    width:60px;
+    border-radius: 5px;;
+    color:white;
+}
