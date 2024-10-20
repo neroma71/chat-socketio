@@ -40,7 +40,7 @@
                 
                 console.log('Message à envoyer : ' + JSON.stringify(message));
                 socket.emit('chat message', message);
-                document.getElementById('m').value = ''; 
+                document.querySelector('#m').value = ''; 
             }
         }
 
