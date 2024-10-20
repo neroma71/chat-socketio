@@ -11,7 +11,7 @@
         <ul id="messages"></ul>
         <div class="zone_saisie">
             <input id="pseudo" placeholder="Entrez votre pseudo" />
-            <input id="m"/>
+            <input id="m" placeholder="Entrez votre message"/>
             <button onclick="send()">Envoyer</button>
         </div>
     </div>
@@ -24,8 +24,8 @@
         });
 
         function send() {
-            let text = document.getElementById('m').value;
-            let pseudo = document.getElementById('pseudo').value; 
+            let text = document.querySelector('#m').value;
+            let pseudo = document.querySelector('#pseudo').value; 
 
             if (pseudo.trim() === '') {
                 alert("Veuillez entrer un pseudo !");
@@ -44,12 +44,12 @@
             }
         }
 
-            socket.on('chat message', function(msg) {
+            socket.on('chat message', (msg)=> {
                 console.log('Message reçu côté client : ' + JSON.stringify(msg)); 
-                let ul = document.getElementById('messages');
+                let ul = document.querySelector('#messages');
                 if (ul) {
                     let li = document.createElement('li');
-                    li.innerText = msg.pseudo + ' : ' + msg.text; 
+                    li.innerText = `${msg.pseudo} : ${msg.text}`; 
                     ul.appendChild(li);
                     window.scrollTo(0, document.body.scrollHeight);
                     console.log('Message ajouté à la liste');
