@@ -16,6 +16,8 @@
             position: relative;
             height: 500px;
             width: 500px;
+            top:50px;
+            left:calc(50% - 250px);
             border: 1px solid grey;
         }
         #messages {
@@ -23,7 +25,7 @@
             margin:0;
             padding: 0;
             color: black;
-            height: 400px; 
+            height:400px; 
             overflow-y: scroll; 
         }
         li{
@@ -33,9 +35,9 @@
         }
         .zone_saisie {
             position: absolute;
-            top: 90%;
+            top:calc(100% - 100px);
             width: 100%;
-            height:50px;
+            height:100px;
             padding:10px;
             background:lightgray;
         }
@@ -43,18 +45,27 @@
             position:relative;
             width: 85%;
         }
+        button{
+            background:rgb(28, 28, 28);
+            cursor:pointer;
+            border:none;
+            height:30px;
+            width:60px;
+            border-radius: 5px;;
+            color:white;
+        }
     </style>
 </head>
 <body>
     <div id="block">
         <ul id="messages"></ul>
         <div class="zone_saisie">
+            <input id="pseudo" placeholder="Entrez votre pseudo" />
             <input id="m"/>
             <button onclick="send()">Envoyer</button>
         </div>
     </div>
 
-    <!-- Charger le script Socket.io depuis le CDN -->
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
         let socket = io();
@@ -65,26 +76,39 @@
 
         function send() {
             let text = document.getElementById('m').value;
+            let pseudo = document.getElementById('pseudo').value; 
+
+            if (pseudo.trim() === '') {
+                alert("Veuillez entrer un pseudo !");
+                return;
+            }
+
             if (text.trim() !== '') {
-                console.log('Message à envoyer : ' + text); // Log pour vérifier le texte à envoyer
-                socket.emit('chat message', text);
-                document.getElementById('m').value = ''; // Vide le champ de saisie après envoi
+                let message = {
+                    pseudo: pseudo,
+                    text: text
+                };
+                
+                console.log('Message à envoyer : ' + JSON.stringify(message));
+                socket.emit('chat message', message);
+                document.getElementById('m').value = ''; 
             }
         }
 
-        socket.on('chat message', function(msg) {
-            console.log('Message reçu côté client : ' + msg); // Log pour confirmer la réception du message
-            let ul = document.getElementById('messages');
-            if (ul) {
-                console.log('Liste des messages trouvée'); // Log si la liste est trouvée
-               let li = document.createElement('li');
-                li.innerText = msg;
-                ul.appendChild(li);
-                console.log('Message ajouté à la liste');
-            } else {
-                console.log('Erreur : élément <ul> non trouvé');
-            }
-        });
+            socket.on('chat message', function(msg) {
+                console.log('Message reçu côté client : ' + JSON.stringify(msg)); 
+                let ul = document.getElementById('messages');
+                if (ul) {
+                    let li = document.createElement('li');
+                    li.innerText = msg.pseudo + ' : ' + msg.text; 
+                    ul.appendChild(li);
+                    window.scrollTo(0, document.body.scrollHeight);
+                    console.log('Message ajouté à la liste');
+                } else {
+                    console.log('Erreur : élément <ul> non trouvé');
+                }
+            });
+
     </script>
 </body>
 </html>
