@@ -1,12 +1,15 @@
 let socket = io();
 
+// Quand on rejoint une salle
 socket.on('connect', function() {
-   socket.emit("enter_room", "general"); // Rejoint la salle "general" par défaut
+    socket.emit("enter_room", "general");
 });
 
 function send() {
     let text = document.querySelector('#m').value;
     let pseudo = document.querySelector('#pseudo').value; 
+    const room = document.querySelector("#tabs li.active").dataset.room;
+    const createdAt = new Date();
 
     if (pseudo.trim() === '') {
         alert("Veuillez entrer un pseudo !");
@@ -16,7 +19,9 @@ function send() {
     if (text.trim() !== '') {
         let message = {
             pseudo: pseudo,
-            text: text
+            text: text,   // Ceci est utilisé pour remplir 'm' dans la base de données
+            room: room,   // Ajoute la room ici
+            createdAt: createdAt
         };
         
         console.log('Message à envoyer : ' + JSON.stringify(message));
@@ -25,32 +30,38 @@ function send() {
     }
 }
 
-socket.on('chat message', (msg) => {
-    console.log('Message reçu côté client : ' + JSON.stringify(msg)); 
+
+// Afficher les anciens messages quand on rejoint une salle
+socket.on('load messages', function(messages) {
     let ul = document.querySelector('#messages');
-    if (ul) {
+    ul.innerHTML = ''; // Effacer les messages actuels
+    messages.forEach((msg) => {
         let li = document.createElement('li');
-        li.innerText = `${msg.pseudo} : ${msg.text}`; 
+        li.innerText = `${msg.pseudo} : ${msg.text}`;
         ul.appendChild(li);
-        window.scrollTo(0, document.body.scrollHeight);
-        console.log('Message ajouté à la liste');
-    } else {
-        console.log('Erreur : élément <ul> non trouvé');
-    }
+    });
 });
 
-// Gestion des tabs pour changer de salle
+// Afficher un nouveau message
+socket.on('chat message', function(msg) {
+    let ul = document.querySelector('#messages');
+    let li = document.createElement('li');
+    li.innerText = `${msg.pseudo} : ${msg.text}`;
+    ul.appendChild(li);
+});
+
+// Changer de salle
 document.querySelectorAll("#tabs li").forEach((tab) => {
     tab.addEventListener("click", function() {
         if (!this.classList.contains("active")) {
             const actif = document.querySelector("#tabs li.active");
             actif.classList.remove("active");
             this.classList.add("active");
+            document.querySelector('#messages').innerHTML = ""; // Effacer les messages affichés
 
-            socket.emit("leave_room", actif.dataset.room); // Quitter la salle actuelle
-            socket.emit("enter_room", this.dataset.room); // Rejoindre la nouvelle salle
-
-            document.querySelector('#messages').innerHTML = ''; // Réinitialise les messages
+            // Rejoindre la nouvelle salle et quitter l'ancienne
+            socket.emit("enter_room", this.dataset.room);
+            socket.emit("leave_room", actif.dataset.room);
         }
     });
 });
