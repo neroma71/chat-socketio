@@ -30,23 +30,32 @@ function send() {
     }
 }
 
-
+function escapeHTML(text) {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 // Afficher les anciens messages quand on rejoint une salle
 socket.on('load messages', function(messages) {
     let ul = document.querySelector('#messages');
     ul.innerHTML = ''; // Effacer les messages actuels
     messages.forEach((msg) => {
+        let created = new Date(msg.createdAt);
         let li = document.createElement('li');
-        li.innerText = `${msg.pseudo} : ${msg.text}`;
+        li.innerHTML = `${escapeHTML(msg.pseudo)} : <br> le ${created.toLocaleString()} <br> ${escapeHTML(msg.text)}`;
         ul.appendChild(li);
     });
 });
 
 // Afficher un nouveau message
 socket.on('chat message', function(msg) {
+    let created = new Date(msg.createdAt);
     let ul = document.querySelector('#messages');
     let li = document.createElement('li');
-    li.innerText = `${msg.pseudo} : ${msg.text}`;
+    li.innerHTML = `${escapeHTML(msg.pseudo)} : <br> le ${created.toLocaleString()} <br> ${escapeHTML(msg.text)}`;
     ul.appendChild(li);
 });
 

@@ -49,7 +49,8 @@ io.on('connection', (socket) => {
         let message = {
             pseudo: msg.pseudo,
             text: msg.text,  // Utiliser 'm' pour la base de données
-            room: msg.room
+            room: msg.room,
+            createdAt : msg.createdAt
         };
     
         // Enregistrer le message dans la base de données
