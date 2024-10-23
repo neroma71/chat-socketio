@@ -51,7 +51,7 @@ socket.on('chat message', function(msg) {
     let created = new Date(msg.createdAt);
     let ul = document.querySelector('#messages');
     let li = document.createElement('li');
-    li.innerHTML = `${escapeHTML(msg.pseudo)} : ${created.toLocaleString()} <br> ${escapeHTML(msg.text)}`;
+    li.innerHTML = `<strong>${escapeHTML(msg.pseudo)}</strong> : le <i>${created.toLocaleString()} </i><p>${escapeHTML(msg.text)}</p>`;
     ul.appendChild(li);
     scrollToBottom(); // Faire défiler vers le bas après l'ajout du message
 });
@@ -63,7 +63,7 @@ socket.on('load messages', function(messages) {
     messages.forEach((msg) => {
         let created = new Date(msg.createdAt);
         let li = document.createElement('li');
-        li.innerHTML = `${escapeHTML(msg.pseudo)} : ${created.toLocaleString()} <br> ${escapeHTML(msg.text)}`;
+        li.innerHTML = `<strong>${escapeHTML(msg.pseudo)}</strong> : le  <i>${created.toLocaleString()}</i><p>${escapeHTML(msg.text)}</p>`;
         ul.appendChild(li);
     });
     scrollToBottom(); // Faire défiler vers le bas après le chargement des messages
