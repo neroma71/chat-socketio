@@ -4,6 +4,7 @@
 }
 :root {
     --main-bg-color:rgb(64, 117, 208);
+    --dark-bg-color:rgb(41, 82, 152);
   }
 
 body {
@@ -69,18 +70,38 @@ h1{
 #messages {
     list-style-type: none;
     margin:0;
-    padding:10px;
+    padding:10px 20px;
     background:rgb(41, 82, 152);
     height:calc(100vh - 100px); 
     overflow-y: scroll; 
 }
 #messages li{
-    margin:10px 0;
-    padding:5px;
+    height:auto;
+    width:50%;
+    margin:20px 0;
+    padding:10px 5px;
     font-family:Helvetica, sans-serif;
-    color:white;
-    
+    color:white; 
+    background:var(--main-bg-color);
+    border-radius:10px;
 }
+#messages li::before {
+    content: '';
+    display: inline-block;
+    background-image: url(../images/puce.jpg);
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    position: relative;
+    left: -5px;
+    top: -10px;
+}
+#messages li:nth-child(even) {
+    margin-left:40px;
+    background:rgb(231, 231, 231);
+    color:grey;
+  }
 #user{
     position:absolute;
     height:100%;
@@ -123,6 +144,7 @@ h1{
     background:var(--main-bg-color);
 }
 #pseudo{
+    position:relative;
     width:200px;
 }
 #m{
@@ -130,6 +152,7 @@ h1{
     width: 85%;
 }
 button{
+    position:relative;
     background:rgb(64, 62, 63);
     cursor:pointer;
     border:none;

@@ -33,9 +33,7 @@ function escapeHTML(text) {
     return text
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/>/g, "&gt;");
 }
 
 // Gestion des connexions Socket.io
@@ -44,6 +42,15 @@ io.on('connection', (socket) => {
 
     // Quand un utilisateur entre dans une salle
     socket.on('enter_room', async (room, pseudo) => {
+        // Vérifier si le pseudo est déjà utilisé dans la salle
+        const existingUser = Object.values(users[room] || {}).includes(pseudo) && users[room][socket.id] !== pseudo;
+
+        if (existingUser) {
+            // Émettre un message d'erreur au client
+            socket.emit('username taken', 'Ce pseudo est déjà utilisé. Veuillez en choisir un autre.');
+            return;
+        }
+
         socket.join(room);
         console.log(`Utilisateur ${pseudo} a rejoint la salle : ${room}`);
 
@@ -68,6 +75,16 @@ io.on('connection', (socket) => {
 
     socket.on('chat message', async (msg) => {
         try {
+            // Vérifier si le pseudo est déjà utilisé dans la salle
+            const existingUser = Object.values(users[msg.room] || {}).includes(msg.pseudo) && users[msg.room][socket.id] !== msg.pseudo;
+
+            if (existingUser) {
+                // Émettre un message d'erreur au client
+                socket.emit('username taken', 'Ce pseudo est déjà utilisé. Veuillez en choisir un autre.');
+                return;
+            }
+
+
             // Échapper les caractères spéciaux
             msg.text = escapeHTML(msg.text);
             msg.pseudo = escapeHTML(msg.pseudo);
