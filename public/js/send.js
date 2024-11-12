@@ -6,10 +6,16 @@ socket.on('connect', function() {
     // Charge les anciens messages lors de la connexion
     socket.emit("enter_room", currentRoom);
 });
- // Gérer le cas où le pseudo est déjà pris
- socket.on('username taken', function(myAlert) {
-    alert(myAlert); // Afficher un message d'alerte à l'utilisateur
-    return;
+  // Gérer le cas où le pseudo est déjà pris
+  socket.on('username taken', function(myAlert) {
+    const errorMessageDiv = document.getElementById('error-message');
+    errorMessageDiv.textContent = myAlert;
+    errorMessageDiv.style.opacity = '1';
+
+    // Masquer le message d'erreur après quelques secondes
+    setTimeout(() => {
+        errorMessageDiv.style.display = 'none';
+    }, 4000); // 5 secondes
 });
 
 // Envoye un message
@@ -65,7 +71,30 @@ socket.on('chat message', function(msg) {
     scrollToBottom();
 });
 
-// Afficher les anciens messages quand on rejoint une salle
+// Écoute de la frappe clavier
+document.querySelector("#m").addEventListener("input", () => {
+    const pseudo = document.querySelector('#pseudo').value.trim();
+    const room2 = document.querySelector("#tabs li.active").dataset.room;
+    console.log('Typing event emitted:', { pseudo, room: room2 }); // log pour le débogage
+    socket.emit("typing", {
+        pseudo: pseudo,
+        room: room2
+    });
+});
+
+socket.on("usertyping", msg => {
+    console.log('User typing event received:', msg); //log pour le débogage
+    const writing = document.querySelector("#writing");
+    writing.innerHTML = `${msg.pseudo} tape un message...`;
+    writing.style.display = 'block';
+
+    // Masquer le message de frappe après quelques secondes
+    setTimeout(() => {
+        writing.style.display = 'none';
+    }, 3000); // 3 secondes
+});
+
+// Affiche les anciens messages quand on rejoint une salle
 socket.on('load messages', function(messages) {
     let ul = document.querySelector('#messages');
     ul.innerHTML = ''; // Effacer les messages actuels

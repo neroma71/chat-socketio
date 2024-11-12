@@ -5,11 +5,37 @@
 :root {
     --main-bg-color:rgb(64, 117, 208);
     --dark-bg-color:rgb(41, 82, 152);
+    --pop-bg-color:rgba(41, 82, 152, 0.5);
   }
 
 body {
     margin: 0;
     padding: 0;
+}
+#error-message {
+    position:absolute;
+    width:400px;
+    height:200px;
+    top: 100px;
+    left:calc(50% - 150px);
+    padding: 10px;
+    background-color:var( --pop-bg-color);
+    border: 1px solid white;
+    border-radius: 5px;
+    font-size:25px;
+    color: white;
+    text-align:center;
+    z-index:10;
+    opacity:0;
+    transition:all 0.5s linear;
+}
+#writing {
+    position:absolute;
+    top:95%;
+    padding: 10px;
+    background-color:var( --pop-bg-color);
+    color: white;
+    display: none;
 }
 #leftbar{
     position:absolute;
@@ -54,11 +80,11 @@ h1{
     cursor:pointer;
 }
 #leftbar li:hover{
-    background:rgb(41, 82, 152);
+    background:var(--dark-bg-color);
 }
 .active{
     font-weight:bold;
-    background:rgb(41, 82, 152);
+    background:var(--dark-bg-color);
 }
 #block {
     position: relative;
@@ -71,7 +97,7 @@ h1{
     list-style-type: none;
     margin:0;
     padding:10px 20px;
-    background:rgb(41, 82, 152);
+    background:var(--dark-bg-color);
     height:calc(100vh - 100px); 
     overflow-y: scroll; 
 }

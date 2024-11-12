@@ -13,7 +13,7 @@ const sequelize = new Sequelize("database", "username", "password", {
     storage: dbPath
 });
 
-// Charger le modèle Chat
+// Charge le modèle Chat
 const Chat = require("./Models/Chat")(sequelize, Sequelize.DataTypes);
 Chat.sync();
 
@@ -54,11 +54,11 @@ io.on('connection', (socket) => {
         socket.join(room);
         console.log(`Utilisateur ${pseudo} a rejoint la salle : ${room}`);
 
-        // Ajouter l'utilisateur à la liste des utilisateurs de la salle
+        // Ajoute l'utilisateur à la liste des utilisateurs de la salle
         if (!users[room]) {
             users[room] = {};
         }
-        users[room][socket.id] = pseudo; // Stocker le pseudo de l'utilisateur
+        users[room][socket.id] = pseudo; // Stocke le pseudo de l'utilisateur
 
         // Charger les anciens messages de la salle
         const messages = await Chat.findAll({
@@ -66,7 +66,7 @@ io.on('connection', (socket) => {
             order: [['createdAt', 'ASC']]
         });
 
-        // Envoyer les anciens messages à l'utilisateur qui vient de rejoindre
+        // Envoyer les anciens messages à l'utilisateur qui vient de rejoindre le tchat
         socket.emit('load messages', messages);
 
         // Émettre la liste des utilisateurs connectés à tous dans la salle
@@ -75,44 +75,48 @@ io.on('connection', (socket) => {
 
     socket.on('chat message', async (msg) => {
         try {
-            // Vérifier si le pseudo est déjà utilisé dans la salle
+            // Vérifie si le pseudo est déjà utilisé dans la salle
             const existingUser = Object.values(users[msg.room] || {}).includes(msg.pseudo) && users[msg.room][socket.id] !== msg.pseudo;
 
             if (existingUser) {
-                // Émettre un message d'erreur au client
+                // Émet un message d'erreur au client
                 socket.emit('username taken', 'Ce pseudo est déjà utilisé. Veuillez en choisir un autre.');
                 return;
             }
 
-
-            // Échapper les caractères spéciaux
+            // Échappe les caractères spéciaux
             msg.text = escapeHTML(msg.text);
             msg.pseudo = escapeHTML(msg.pseudo);
 
             await Chat.create(msg);
             console.log('Message enregistré dans la base de données');
-            // Émettre le message à tous les utilisateurs dans la salle
+            // Émet le message à tous les utilisateurs dans la salle
             io.to(msg.room).emit('chat message', msg);
         } catch (error) {
             console.error('Erreur lors de l\'enregistrement du message : ', error);
         }
     });
 
+    //Message qui indique que quelqu'un tape
+    socket.on('typing', msg => {
+        socket.to(msg.room).emit("usertyping", msg);
+    });
+
     socket.on('leave_room', (room) => {
         socket.leave(room);
         console.log(`Utilisateur ${users[room][socket.id]} a quitté la salle : ${room}`);
 
-        // Supprimer l'utilisateur de la liste des utilisateurs de la salle
+        // Supprime l'utilisateur de la liste des utilisateurs de la salle
         delete users[room][socket.id];
 
-        // Émettre la liste mise à jour des utilisateurs à tous les clients dans la salle
+        // Émet la liste mise à jour des utilisateurs à tous les clients dans la salle
         io.to(room).emit('user list', Object.values(users[room]));
     });
 
     socket.on('disconnect', () => {
         console.log(`Utilisateur déconnecté`);
 
-        // Supprimer l'utilisateur de toutes les salles
+        // Supprime l'utilisateur de toutes les salles
         for (let room in users) {
             if (users[room][socket.id]) {
                 delete users[room][socket.id];
@@ -122,7 +126,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// Démarrer le serveur
+// Démarre le serveur
 http.listen(3000, () => {
     console.log("Serveur en cours d'exécution sur le port 3000");
 });
